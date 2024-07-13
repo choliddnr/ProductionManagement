@@ -1,0 +1,10 @@
+export default defineEventHandler(async (event) => {
+  const id = getQuery(event).id as string;
+  const body = await readBody(event);
+  console.log("body:", body);
+
+  return await usePocketbase().send("/c_api/items/stock/update/" + id, {
+    method: "PATCH",
+    body: body,
+  });
+});
