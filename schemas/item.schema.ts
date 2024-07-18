@@ -6,6 +6,14 @@ export const itemCategories = [
   "final product",
 ] as const;
 
+export const IngredientsSchema = z.object({
+  ingredient: z.string(),
+  measure: z.number(),
+  subtitute: z.array(z.string()),
+});
+
+export type Ingredients = z.output<typeof IngredientsSchema>;
+
 const ItemCategoriesEnum = z.enum([...itemCategories]);
 export type ItemCategories = z.output<typeof ItemCategoriesEnum>;
 
@@ -15,6 +23,7 @@ export const AddItemSchema = z.object({
   barcode: z.number().optional(),
   category: z.string().optional(),
   unit: z.string().min(2),
+  ingredients: z.array(IngredientsSchema.optional()),
 });
 
 export const EditItemSchema = z.object({

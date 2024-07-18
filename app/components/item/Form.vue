@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import type { FormSubmitEvent } from "#ui/types";
 import { ItemConfirm } from "#components";
-
 import { type output as zodOutput } from "zod";
 import {
   AddItemSchema,
   EditItemSchema,
   type Item,
+  type Ingredients,
 } from "~~/schemas/item.schema";
 
 const props = defineProps<{
@@ -16,16 +16,22 @@ const props = defineProps<{
 const emits = defineEmits<{
   close: [];
 }>();
+
+const createMessage =
+  "Category, Unit, dan Barcode bersifat permanen dan tidak dapat dirubah. Apakah data yang anda masukan sudah benar?";
+const updateMessage = "Apakah anda yakin data yang anda masukan sudah benar?";
+const continueLabel = "Iya, Simpan";
+const cancelLabel = "Tinjau kembali";
+const isSelfProduced = ref<boolean>(false);
 const isEdit = !props.id ? false : true;
+const modal = useModal();
+const toast = useToast();
+const Schema = !isEdit ? AddItemSchema : EditItemSchema;
 
 const { $addData, $editData } = useNuxtApp();
 const { item_categories } = storeToRefs(useItemCategoriesStore());
 const { fetch: updateItems } = useItemsStore();
 
-const modal = useModal();
-const toast = useToast();
-
-const Schema = !isEdit ? AddItemSchema : EditItemSchema;
 type FormSchema = zodOutput<typeof Schema>;
 const state = reactive<Partial<Item>>({
   title: undefined,
@@ -33,6 +39,7 @@ const state = reactive<Partial<Item>>({
   barcode: undefined,
   category: undefined,
   unit: undefined,
+  ingredients: null,
   updated: undefined,
 });
 const { data: item } = await useFetch<Item>("/api/items", {
@@ -48,13 +55,8 @@ if (isEdit) {
   // console.log("state", state);
 }
 
-const createMessage =
-  "Category, Unit, dan Barcode bersifat permanen dan tidak dapat dirubah. Apakah data yang anda masukan sudah benar?";
-const updateMessage = "Apakah anda yakin data yang anda masukan sudah benar?";
-const continueLabel = "Iya, Simpan";
-const cancelLabel = "Tinjau kembali";
-
 const onSubmit = async (event: FormSubmitEvent<FormSchema>) => {
+  state.ingredients = isSelfProduced.value ? ([] as Ingredients[]) : null;
   modal.open(ItemConfirm, {
     message: isEdit ? updateMessage : createMessage,
     label: { continue: continueLabel, cancel: cancelLabel },
@@ -164,6 +166,9 @@ const onSubmit = async (event: FormSubmitEvent<FormSchema>) => {
           </UFormGroup>
           <UFormGroup label="Unit" name="unit">
             <UInput v-model="state.unit" />
+          </UFormGroup>
+          <UFormGroup label="Self Produced" name="isSelfProduced">
+            <UToggle v-model="isSelfProduced" />
           </UFormGroup>
         </div>
         <UButton @click="onSubmit">Submit</UButton>

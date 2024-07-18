@@ -131,19 +131,7 @@ export default defineNuxtPlugin({
         let req = id ? store.get(id) : store.getAll();
         req.onsuccess = async (e) => {
           // console.log("item length", req.result.length);
-          if (req.result.length > 0) {
-            resolve(req.result);
-          } else {
-            await $fetch("/api/" + storename, {
-              onResponse: async ({ response }) => {
-                console.log("fetching to server:", storename, response._data);
-
-                await _addData(storename, response._data);
-                if (id) await _getData(storename, id);
-                resolve(response._data);
-              },
-            });
-          }
+          resolve(req.result);
         };
         req.onerror = (e) => {
           console.error("Fetching item failed!");

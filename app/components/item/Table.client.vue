@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { type Item, itemCategories } from "~~/schemas/item.schema";
-import { LazyItemForm, LazyItemConfirm, LazyItemStock } from "#components";
+import {
+  LazyItemForm,
+  LazyItemConfirm,
+  LazyItemStock,
+  LazyItemIngredient,
+} from "#components";
 
 const { itemsTable, selectedCategories, sort, onWorkingItem } = storeToRefs(
   useItemsTableStore()
@@ -108,6 +113,26 @@ const onDelete = async (id: string, lastUpdate: Date) => {
         <span class="text-gray-900 dark:text-white font-medium">{{
           row.title
         }}</span>
+        <UButton
+          v-if="row.ingredients != null"
+          variant="ghost"
+          class="p-0"
+          :ui="{ rounded: 'rounded-full' }"
+          @click="
+            slideover.open(LazyItemIngredient, {
+              id: row.id,
+              onClose: () => {
+                slideover.close();
+              },
+            })
+          "
+        >
+          <UIcon
+            name="i-heroicons-information-circle"
+            class="w-5 h-5"
+            color="blue"
+          />
+        </UButton>
       </div>
     </template>
     <template #forecast-data="{ row }">
