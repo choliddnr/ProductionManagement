@@ -1,11 +1,6 @@
 <script setup lang="ts">
 import { type Item, itemCategories } from "~~/schemas/item.schema";
-import {
-  LazyItemForm,
-  LazyItemConfirm,
-  LazyItemStock,
-  LazyItemIngredient,
-} from "#components";
+import { LazyForm, LazyConfirm, LazyStock, LazyIngredient } from "#components";
 
 const { itemsTable, selectedCategories, sort, onWorkingItem } = storeToRefs(
   useItemsTableStore()
@@ -119,7 +114,7 @@ const onDelete = async (id: string, lastUpdate: Date) => {
           class="p-0"
           :ui="{ rounded: 'rounded-full' }"
           @click="
-            slideover.open(LazyItemIngredient, {
+            slideover.open(LazyIngredient, {
               id: row.id,
               onClose: () => {
                 slideover.close();
@@ -156,7 +151,7 @@ const onDelete = async (id: string, lastUpdate: Date) => {
           icon="i-heroicons-arrow-path"
           @click="
             () => {
-              slideover.open(LazyItemStock, {
+              slideover.open(LazyStock, {
                 id: row.id,
                 onClose: () => {
                   slideover.close();
@@ -195,7 +190,7 @@ const onDelete = async (id: string, lastUpdate: Date) => {
             @click="
               () => {
                 onWorkingItem = row;
-                slideover.open(LazyItemForm, {
+                slideover.open(LazyForm, {
                   id: row.id,
                   onClose: () => {
                     slideover.close();
@@ -213,7 +208,7 @@ const onDelete = async (id: string, lastUpdate: Date) => {
             @click="
               () => {
                 onWorkingItem = row;
-                modal.open(LazyItemConfirm, {
+                modal.open(LazyConfirm, {
                   message: deleteMessage,
                   label: {
                     continue: continueDeleteLabel,

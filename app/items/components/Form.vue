@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { FormSubmitEvent } from "#ui/types";
-import { ItemConfirm } from "#components";
+import { Confirm } from "#components";
 import { type output as zodOutput } from "zod";
 import {
   AddItemSchema,
@@ -57,7 +57,7 @@ if (isEdit) {
 
 const onSubmit = async (event: FormSubmitEvent<FormSchema>) => {
   state.ingredients = isSelfProduced.value ? ([] as Ingredients[]) : null;
-  modal.open(ItemConfirm, {
+  modal.open(Confirm, {
     message: isEdit ? updateMessage : createMessage,
     label: { continue: continueLabel, cancel: cancelLabel },
     onContinue: async () => {

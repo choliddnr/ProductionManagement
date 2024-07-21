@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ItemCategory, ItemConfirm } from "#components";
+import { Category, Confirm } from "#components";
 import type { ItemCategory as ItemCategoryType } from "~~/schemas/item.schema";
 
 const toast = useToast();
@@ -24,7 +24,7 @@ const settings = [
 ];
 const { item_categories } = storeToRefs(useItemCategoriesStore());
 const deleteCategory = async (category: ItemCategoryType & { id: string }) => {
-  slideover.open(ItemConfirm, {
+  slideover.open(Confirm, {
     message: `Semua data terkait akan dihapus secara permanen dan tidak dapat dipulihkan. \nApakah anda yakin mau menghapus kategory ${category.title}`,
     label: {
       continue: "Hapus",
@@ -100,7 +100,7 @@ const deleteCategory = async (category: ItemCategoryType & { id: string }) => {
                 :ui="{ rounded: 'rounded-full' }"
                 @click="
                   () => {
-                    slideover.open(ItemCategory, {
+                    slideover.open(Category, {
                       id: category.id,
                       onClose: () => slideover.close(),
                     });
@@ -135,7 +135,7 @@ const deleteCategory = async (category: ItemCategoryType & { id: string }) => {
           class="ml-3 mt-3"
           @click="
             () => {
-              slideover.open(ItemCategory, {
+              slideover.open(Category, {
                 onClose: () => slideover.close(),
               });
             }

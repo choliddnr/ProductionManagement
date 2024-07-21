@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ItemForm } from "#components";
+import { Form } from "#components";
 import type { Item } from "~~/schemas/item.schema";
 
 const { item_categories } = storeToRefs(useItemCategoriesStore());
@@ -17,7 +17,7 @@ const isOpen = ref<boolean>(false);
 const slideover = useSlideover();
 const item = ref<Item>();
 const openAddForm = () => {
-  slideover.open(ItemForm, {
+  slideover.open(Form, {
     onClose: slideover.close,
   });
 };
@@ -75,7 +75,7 @@ const test = async () => {
         </template>
       </UDashboardToolbar>
 
-      <ItemTable />
+      <Table />
     </UDashboardPanel>
   </UDashboardPage>
 </template>

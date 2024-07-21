@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { FormSubmitEvent } from "#ui/types";
-import { ItemConfirm } from "#components";
+import { Confirm } from "#components";
 import { type output as zodOutput } from "zod";
 import {
   IngredientsSchema,
@@ -119,7 +119,7 @@ const editIngredient = async (index: number) => {
 };
 
 const onSubmit = async (event: FormSubmitEvent<FormSchema>) => {
-  modal.open(ItemConfirm, {
+  modal.open(Confirm, {
     message: message,
     label: { continue: continueLabel, cancel: cancelLabel },
     onContinue: async () => {
@@ -320,7 +320,7 @@ watch(state, () => {
             size="2xs"
             @click="
               () => {
-                modal.open(ItemConfirm, {
+                modal.open(Confirm, {
                   message: 'Apakah anda yakin?',
                   label: {
                     continue: 'Iya',

@@ -1,3 +1,3 @@
 <template>
-  <LazyItemSetting />
+  <LazySetting />
 </template>
