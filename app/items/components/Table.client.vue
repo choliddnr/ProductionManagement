@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { type Item, itemCategories } from "~~/schemas/item.schema";
-import { LazyForm, LazyConfirm, LazyStock, LazyIngredient } from "#components";
+import { LazyForm, LazyConfirm, LazyStock, LazyIngredients } from "#components";
 
 const { itemsTable, selectedCategories, sort, onWorkingItem } = storeToRefs(
   useItemsTableStore()
@@ -114,8 +114,8 @@ const onDelete = async (id: string, lastUpdate: Date) => {
           class="p-0"
           :ui="{ rounded: 'rounded-full' }"
           @click="
-            slideover.open(LazyIngredient, {
-              id: row.id,
+            slideover.open(LazyIngredients, {
+              productId: row.id,
               onClose: () => {
                 slideover.close();
               },

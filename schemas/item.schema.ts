@@ -7,9 +7,11 @@ export const itemCategories = [
 ] as const;
 
 export const IngredientsSchema = z.object({
-  ingredient: z.string(),
-  measure: z.number(),
-  subtitute: z.array(z.string()),
+  id: z.string().optional(),
+  product: z.string(),
+  item: z.string(),
+  qty: z.number(),
+  substitutes: z.array(z.string()),
 });
 
 export type Ingredients = z.output<typeof IngredientsSchema>;
@@ -23,7 +25,7 @@ export const AddItemSchema = z.object({
   barcode: z.number().optional(),
   category: z.string().optional(),
   unit: z.string().min(2),
-  ingredients: z.array(IngredientsSchema.optional()),
+  selfMade: z.boolean(),
 });
 
 export const EditItemSchema = z.object({

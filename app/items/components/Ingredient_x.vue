@@ -9,20 +9,21 @@ import {
 } from "~~/schemas/item.schema";
 
 const props = defineProps<{
-  id?: string;
+  productId: string;
 }>();
 
 const emits = defineEmits<{
   close: [];
 }>();
 const item = ref<Item>();
-await useFetch<Item>("/api/items", {
+const ingredients = ref<Partial<(Ingredients & { item: Item })[]>>()
+await useFetch<Ingredients>("/api/items/ingredients", {
   method: "GET",
   query: {
-    id: props.id,
+    id: props.productId,
   },
   onResponse: ({ response }) => {
-    item.value = response._data;
+    ingredients.value = response._data;
   },
 });
 
@@ -40,28 +41,28 @@ const { fetch: updateItems } = useItemsStore();
 type FormSchema = zodOutput<typeof IngredientsSchema>;
 
 const state = reactive<Partial<Ingredients>>({
-  ingredient: undefined,
-  measure: undefined,
-  subtitute: [],
+  item: undefined,
+  qty: undefined,
+  substitutes: [],
 });
 
-const ingredients = computed<Partial<(Ingredients & { item: Item })[]>>(() => {
-  let x: (Ingredients & { item: Item })[] = [];
-  item.value.ingredients.forEach((ingredient, index) => {
-    const data = {
-      ingredient: ingredient.ingredient,
-      measure: ingredient.measure,
-      subtitute: ingredient.subtitute,
-      item: itemsMap.value.get(ingredient.ingredient),
-    };
-    x.push(data);
-  });
-  return x;
-});
+// const ingredients = computed<Partial<(Ingredients & { item: Item })[]>>(() => {
+//   let x: (Ingredients & { item: Item })[] = [];
+//   item.value.ingredients.forEach((ingredient, index) => {
+//     const data = {
+//       ingredient: ingredient.ingredient,
+//       qty: ingredient.qty,
+//       substitutes: ingredient.substitutes,
+//       item: itemsMap.value.get(ingredient.ingredient),
+//     };
+//     x.push(data);
+//   });
+//   return x;
+// });
 
 const options = computed(() => {
   return items.value.filter(
-    (e) => e.id != item.value.id && !state.subtitute.includes(e.id)
+    (e) => e.id != item.value.id && !state.substitutes.includes(e.id)
   );
 });
 
@@ -69,9 +70,13 @@ const update = async () => {
   if (showForm.value) showForm.value = false;
   await $fetch("/api/items", {
     method: "PATCH",
-    params: { id: item.value.id },
+    params: { 
+      product: props.productId,
+      item: state.item
+    },
     body: {
-      ingredients: item.value.ingredients,
+      qty: state.qty,
+      substitutes: state.substitutes,
       updated: item.value.updated,
     },
     onResponse: async ({ response }) => {
@@ -112,31 +117,31 @@ const update = async () => {
 const editIngredient = async (index: number) => {
   if (!showForm.value) showForm.value = true;
   indexToEdit.value = index;
-  state.ingredient = ingredients.value[indexToEdit.value].ingredient;
-  state.measure = ingredients.value[indexToEdit.value].measure;
-  state.subtitute = ingredients.value[indexToEdit.value].subtitute;
+  state.item = ingredients.value[indexToEdit.value].item;
+  state.qty = ingredients.value[indexToEdit.value].qty;
+  state.substitutes = ingredients.value[indexToEdit.value].substitutes;
   // item.value.ingredients[index] = state;
 };
 
-const onSubmit = async (event: FormSubmitEvent<FormSchema>) => {
-  modal.open(Confirm, {
-    message: message,
-    label: { continue: continueLabel, cancel: cancelLabel },
-    onContinue: async () => {
-      if (indexToEdit.value) {
-        item.value.ingredients[indexToEdit.value] = state;
-      } else {
-        item.value.ingredients.push(state);
-      }
-      await update();
-      modal.close();
-    },
-    onCancel: () => modal.close(),
-  });
-};
-watch(state, () => {
-  console.log("state", state, item.value.ingredients, ingredients.value);
-});
+// const onSubmit = async (event: FormSubmitEvent<FormSchema>) => {
+//   modal.open(Confirm, {
+//     message: message,
+//     label: { continue: continueLabel, cancel: cancelLabel },
+//     onContinue: async () => {
+//       if (indexToEdit.value) {
+//         item.value.ingredients[indexToEdit.value] = state;
+//       } else {
+//         item.value.ingredients.push(state);
+//       }
+//       await update();
+//       modal.close();
+//     },
+//     onCancel: () => modal.close(),
+//   });
+// };
+// watch(state, () => {
+//   console.log("state", state, item.value.ingredients, ingredients.value);
+// });
 </script>
 
 <template>
@@ -144,7 +149,7 @@ watch(state, () => {
     prevent-close
     :ui="{ header: { base: 'grid grid-cols-12' } }"
   >
-    <template #header>
+ <!--   <template #header>
       <h3
         class="text-base font-semibold leading-6 text-gray-900 dark:text-white col-span-10"
       >
@@ -161,8 +166,8 @@ watch(state, () => {
               () => {
                 indexToEdit = undefined;
                 state.ingredient = undefined;
-                state.measure = undefined;
-                state.subtitute = [];
+                state.qty = undefined;
+                state.substitutes = [];
                 if (!showForm) showForm = true;
               }
             "
@@ -178,7 +183,7 @@ watch(state, () => {
         />
       </div>
     </template>
-    <!-- Form -->
+Form
     <Transition>
       <UForm
         :schema="IngredientsSchema"
@@ -208,9 +213,9 @@ watch(state, () => {
             >
             </USelectMenu>
           </UFormGroup>
-          <UFormGroup label="Takaran" name="measure">
+          <UFormGroup label="Takaran" name="qty">
             <UInput
-              v-model="state.measure"
+              v-model="state.qty"
               type="number"
               class="mb-1"
               :placeholder="
@@ -222,12 +227,12 @@ watch(state, () => {
           </UFormGroup>
           <UFormGroup
             label="Opsi pengganti"
-            name="subtitute"
+            name="substitutes"
             class="col-span-3"
           >
             <template #description>
               <UBadge
-                v-for="(sub, i) in state.subtitute"
+                v-for="(sub, i) in state.substitutes"
                 :ui="{ rounded: 'rounded-full' }"
                 class="mr-1 mb-1"
                 variant="soft"
@@ -244,12 +249,12 @@ watch(state, () => {
                         'bg-transparent dark:bg-transparent hover:bg-transparent dark:hover:bg-transparent',
                     },
                   }"
-                  @click="state.subtitute.splice(i, 1)"
+                  @click="state.substitutes.splice(i, 1)"
                 />
               </UBadge>
             </template>
             <USelectMenu
-              v-model="state.subtitute"
+              v-model="state.substitutes"
               :options="options.filter((e) => e.id != state.ingredient)"
               searchable
               multiple
@@ -260,8 +265,8 @@ watch(state, () => {
               :search-attribute="['title']"
             >
               <template #label>
-                <span v-if="state.subtitute.length" class="truncate"
-                  >{{ state.subtitute.length }} item dipilih</span
+                <span v-if="state.substitutes.length" class="truncate"
+                  >{{ state.substitutes.length }} item dipilih</span
                 >
                 <span v-else class="text-gray-500">Pilih item</span>
               </template>
@@ -291,13 +296,13 @@ watch(state, () => {
           <span class="text-gray-900 dark:text-white font-semibold"
             >{{ s.item.title }}
             <UBadge color="gray" :ui="{ rounded: 'rounded-full' }"
-              >{{ s.measure.toString() }} {{ s.item.unit }}</UBadge
+              >{{ s.qty.toString() }} {{ s.item.unit }}</UBadge
             >
           </span>
         </template>
         <template #description>
           <UBadge
-            v-for="(sub, idx) in s.subtitute"
+            v-for="(sub, idx) in s.substitutes"
             class="mr-1 mb-1.5"
             :ui="{ rounded: 'rounded-full' }"
             >{{ itemsMap.get(sub).title }}</UBadge
@@ -340,7 +345,7 @@ watch(state, () => {
           /> </template
       ></UDashboardSection>
       <UDivider />
-    </div>
+    </div>-->
   </UDashboardSlideover>
 </template>
 <style>
