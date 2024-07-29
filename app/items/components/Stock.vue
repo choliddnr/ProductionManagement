@@ -11,7 +11,7 @@ const { data: item } = await useFetch<Item>("/api/items", {
     id: props.id,
   },
 });
-const stockState = reactive({
+const stockState = reactive<{ stock: number; description: string }>({
   stock: undefined,
   description: undefined,
 });
@@ -21,7 +21,7 @@ const toast = useToast();
 const { fetch: updateItems } = useItemsStore();
 const { $editData } = useNuxtApp();
 
-const syncStock = () => {
+const syncStock = (currentStock: number) => {
   modal.open(Confirm, {
     message: "Apakah anda yakin stok yang baru sudah sesuai?",
     label: {
@@ -33,7 +33,7 @@ const syncStock = () => {
         method: "PATCH",
         params: { id: item.value.id },
         body: {
-          stock: 21,
+          stock: stockState.stock - currentStock,
           description: stockState.description,
           updated: item.value.updated,
         },
@@ -86,12 +86,14 @@ const syncStock = () => {
           >Stock sekarang: {{ item.stock.toFixed(2) }} {{ item.unit }}</UBadge
         >
         <UFormGroup label="Stock terbaru" name="newStock">
-          <UInput v-model="stockState.stock" />
+          <UInput v-model="stockState.stock" type="number" />
         </UFormGroup>
         <UFormGroup label="Description" name="description">
           <UTextarea v-model="stockState.description" />
         </UFormGroup>
-        <UButton @click="syncStock" class="w-min-20 justify-center mr-3"
+        <UButton
+          @click="syncStock(item.stock)"
+          class="w-min-20 justify-center mr-3"
           >Simpan</UButton
         >
         <UButton color="red" @click="emits('close')">Batal</UButton>

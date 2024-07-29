@@ -117,6 +117,8 @@ const onDelete = async (id: string, lastUpdate: Date) => {
             slideover.open(LazyIngredients, {
               productId: row.id,
               onClose: () => {
+                // console.log('closse slideover');
+
                 slideover.close();
               },
             })

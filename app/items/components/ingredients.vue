@@ -9,7 +9,7 @@ const props = defineProps<{
   productId: string;
 }>();
 const emits = defineEmits(["close"]);
-const { itemsMap, items } = storeToRefs(useItemsStore());
+const { itemsMap } = storeToRefs(useItemsStore());
 const { ingredients, product } = storeToRefs(useIngredientsStore());
 const { fetch: fetchIng } = useIngredientsStore();
 const showForm = ref<boolean>(false);
