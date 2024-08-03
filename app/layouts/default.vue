@@ -26,6 +26,17 @@ const links = [
     },
   },
   {
+    id: "orders",
+    label: "Orders",
+    icon: "i-heroicons-document-text-20-solid",
+    to: "/orders",
+    badge: "4",
+    tooltip: {
+      text: "Item",
+      shortcuts: ["G", "I"],
+    },
+  },
+  {
     id: "inbox",
     label: "Inbox",
     icon: "i-heroicons-inbox",

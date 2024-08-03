@@ -4,12 +4,23 @@ export default defineNuxtConfig({
     preset: "bun",
   },
 
-  extends: [process.env.NUXT_UI_PRO_PATH || "@nuxt/ui-pro", "app/items"],
+  extends: [
+    process.env.NUXT_UI_PRO_PATH || "@nuxt/ui-pro",
+    "app/items",
+    "app/orders",
+    "app/customers",
+    "app/products",
+  ],
 
   modules: ["@nuxt/ui", "@nuxt/fonts", "@vueuse/nuxt", "@pinia/nuxt"],
 
   pinia: {
-    storesDirs: ["./app/items/stores"],
+    storesDirs: [
+      "./app/items/stores",
+      "./app/orders/stores",
+      "./app/customers/stores",
+      "./app/products/stores",
+    ],
   },
 
   ui: {
