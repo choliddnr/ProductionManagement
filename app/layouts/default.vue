@@ -69,10 +69,6 @@ const links = [
         exact: true,
       },
       {
-        label: "Items",
-        to: "/settings/items",
-      },
-      {
         label: "Members",
         to: "/settings/members",
       },

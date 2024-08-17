@@ -1,3 +1,10 @@
 export default defineEventHandler(async () => {
-  return await usePocketbase().collection("customers").getFullList();
+  const is_customer = true;
+  return await usePocketbase()
+    .collection("stakeholders")
+    .getFullList({
+      filter: usePocketbase().filter("is_customer = {:is_customer}", {
+        is_customer: is_customer,
+      }),
+    });
 });

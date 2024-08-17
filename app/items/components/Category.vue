@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Confirm, UButton } from "#components";
-import { type ItemCategory, ItemCategorySchema } from "~~/schemas/item.schema";
-import { type Base } from "~~/schemas/types.d";
+import { ModalConfirm, UButton } from "#components";
+import { type ItemCategory, ItemCategorySchema } from "~/schemas/item.schema";
+import { type Base } from "~/schemas/types.d";
 import colors from "#tailwind-config/theme/colors";
 
 const props = defineProps<{
@@ -44,7 +44,7 @@ const submit = () => {
   if (isEdit) body.updated = category.updated;
   console.log("body", body);
 
-  modal.open(Confirm, {
+  modal.open(ModalConfirm, {
     message: "Apakah anda yakin semua field terisi dengan benar?",
     label: {
       continue: "Iya, Simpan",

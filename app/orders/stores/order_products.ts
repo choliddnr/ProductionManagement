@@ -1,15 +1,17 @@
 import { defineStore, acceptHMRUpdate } from "pinia";
-import type { OrderProducts } from "~~/schemas/order.schema";
+import type { OrderProducts } from "~/schemas/order.schema";
 
 export const useOrderProductsStore = defineStore("order_products", () => {
   const { order } = storeToRefs(useOrdersStore());
-  const { data: order_products } = useFetch<OrderProducts[]>(
-    "/api/orders/products",
-    {
-      method: "GET",
-      query: { orderId: order.value.id },
-    }
-  );
+  const orderId = computed(() => order.value.id);
+  const order_products = ref<OrderProducts[]>();
+  useFetch("/api/orders/products", {
+    method: "GET",
+    query: { orderId },
+    onResponse: ({ response }) => {
+      order_products.value = response._data;
+    },
+  });
 
   return { order_products };
 });

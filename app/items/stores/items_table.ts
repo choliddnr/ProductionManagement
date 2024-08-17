@@ -1,6 +1,6 @@
 import { defineStore, acceptHMRUpdate, skipHydrate } from "pinia";
-import type { ItemsTable } from "~~/schemas/item.schema";
-import type { Category } from "~~/schemas/types";
+import type { ItemsTable } from "~/schemas/item.schema";
+import type { Category } from "~/schemas/types";
 import _ from "lodash";
 
 export const useItemsTableStore = defineStore("items_table", () => {

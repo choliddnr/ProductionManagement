@@ -1,5 +1,3 @@
-import { method } from "lodash";
-
 export default defineEventHandler(async (event) => {
   const data = await usePocketbase().send(
     "/c_api/items/stock/update/0k8dloanj5tmrcf",

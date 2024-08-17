@@ -3,8 +3,8 @@ import {
   IngredientsSchema,
   type Ingredients,
   type Item,
-} from "~~/schemas/item.schema";
-import Confirm from "./Confirm.vue";
+} from "~/schemas/item.schema";
+import ModalConfirm from "../../base/components/ModalModalConfirm.vue";
 
 /**
  * Define Variable
@@ -12,7 +12,7 @@ import Confirm from "./Confirm.vue";
 const props = defineProps<{
   ingId: string | undefined;
   otherIng: string[];
-  productId: string;
+  selfProducedItemId: string;
 }>();
 const { ingredients } = storeToRefs(useIngredientsStore());
 const emits = defineEmits(["close"]);
@@ -23,8 +23,8 @@ const cancelLabel = "Tinjau kembali";
 const { itemsMap, items } = storeToRefs(useItemsStore());
 const state = reactive<Partial<Ingredients & { updated: Date }>>({
   id: undefined,
-  item: undefined,
-  qty: undefined,
+  ingredient: undefined,
+  quantity: undefined,
   substitutes: [],
   updated: undefined,
 });
@@ -32,9 +32,9 @@ const options = computed(() => {
   return items.value.filter(
     (e) =>
       ![
-        ...props.otherIng.filter((i) => i != state.item),
+        ...props.otherIng.filter((i) => i != state.ingredient),
         props.ingId,
-        props.productId,
+        props.selfProducedItemId,
       ].includes(e.id)
   );
 });
@@ -47,16 +47,16 @@ if (props.ingId) {
       params: { id: props.ingId },
       onResponse: ({ response }) => {
         console.log("response._data", response._data);
-        state.item = (response._data as Ingredients).item;
-        state.qty = (response._data as Ingredients).qty;
+        state.ingredient = (response._data as Ingredients).ingredient;
+        state.quantity = (response._data as Ingredients).quantity;
         state.substitutes = (response._data as Ingredients).substitutes;
         state.updated = response._data.updated;
       },
     }
   );
 } else {
-  state.item = undefined;
-  state.qty = undefined;
+  state.ingredient = undefined;
+  state.quantity = undefined;
   state.substitutes = [];
   state.updated = undefined;
 }
@@ -65,16 +65,16 @@ if (props.ingId) {
  * Func
  */
 const onSubmit = async () => {
-  modal.open(Confirm, {
+  modal.open(ModalConfirm, {
     message: message,
     label: { continue: continueLabel, cancel: cancelLabel },
     onContinue: async () => {
       await $fetch("/api/items/ingredients", {
         method: props.ingId ? "PUT" : "POST",
         body: {
-          product: props.productId,
-          item: state.item,
-          qty: state.qty,
+          self_produced_item: props.selfProducedItemId,
+          ingredient: state.ingredient,
+          quantity: state.quantity,
           substitutes: state.substitutes,
           updated: state.updated,
         },
@@ -87,9 +87,9 @@ const onSubmit = async () => {
               return i.id == props.ingId
                 ? {
                     id: response._data.id,
-                    product: response._data.product,
-                    item: response._data.item,
-                    qty: response._data.qty,
+                    self_produced_item: props.selfProducedItemId,
+                    ingredient: response._data.item,
+                    quantity: response._data.quantity,
                     substitutes: response._data.substitutes,
                     info: i.info,
                   }
@@ -98,11 +98,11 @@ const onSubmit = async () => {
           } else {
             ingredients.value.push({
               id: response._data.id,
-              product: response._data.product,
-              item: response._data.item,
-              qty: response._data.qty,
+              self_produced_item: props.selfProducedItemId,
+              ingredient: response._data.ingredient,
+              quantity: response._data.quantity,
               substitutes: response._data.substitutes,
-              info: itemsMap.value.get(response._data.item),
+              info: itemsMap.value.get(response._data.ingredient),
             });
           }
         },
@@ -123,7 +123,7 @@ const editIngredient = async () => {};
       <UFormGroup label="Bahan" name="ingredient" class="col-span-2">
         <USelectMenu
           :disabled="ingId != undefined"
-          v-model="state.item"
+          v-model="state.ingredient"
           :options="
             options
             // ingId
@@ -139,13 +139,15 @@ const editIngredient = async () => {};
         >
         </USelectMenu>
       </UFormGroup>
-      <UFormGroup label="Takaran" name="qty">
+      <UFormGroup label="Takaran" name="quantity">
         <UInput
-          v-model="state.qty"
+          v-model="state.quantity"
           type="number"
           class="mb-1"
           :placeholder="
-            state.item ? ' % setiap ' + itemsMap.get(state.item).unit : ' '
+            state.ingredient
+              ? ' % setiap ' + itemsMap.get(state.ingredient).uom
+              : ' '
           "
         />
       </UFormGroup>
@@ -175,7 +177,7 @@ const editIngredient = async () => {};
         </template>
         <USelectMenu
           v-model="state.substitutes"
-          :options="options.filter((e) => e.id != state.item)"
+          :options="options.filter((e) => e.id != state.ingredient)"
           searchable
           searchable-placeholder="Ketik item name"
           multiple

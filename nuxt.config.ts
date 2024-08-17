@@ -1,25 +1,27 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  nitro: {
-    preset: "bun",
-  },
-
   extends: [
-    process.env.NUXT_UI_PRO_PATH || "@nuxt/ui-pro",
+    "@nuxt/ui-pro",
+    "app/base",
     "app/items",
-    "app/orders",
     "app/customers",
-    "app/products",
+    "app/orders",
   ],
 
-  modules: ["@nuxt/ui", "@nuxt/fonts", "@vueuse/nuxt", "@pinia/nuxt"],
+  modules: [
+    "@nuxt/eslint",
+    "@nuxt/fonts",
+    "@nuxt/ui",
+    "@vueuse/nuxt",
+    "@pinia/nuxt",
+  ],
 
   pinia: {
     storesDirs: [
       "./app/items/stores",
       "./app/orders/stores",
       "./app/customers/stores",
-      "./app/products/stores",
+      // "./app/products/stores",
     ],
   },
 
@@ -30,6 +32,11 @@ export default defineNuxtConfig({
 
   colorMode: {
     disableTransition: true,
+  },
+
+  routeRules: {
+    // Temporary workaround for prerender regression. see https://github.com/nuxt/nuxt/issues/27490
+    "/": { prerender: true },
   },
 
   devtools: {
@@ -44,10 +51,14 @@ export default defineNuxtConfig({
     compatibilityVersion: 4,
   },
 
-  compatibilityDate: "2024-07-04",
-  vite: {
-    optimizeDeps: {
-      exclude: ["unicorn-magic"],
+  eslint: {
+    config: {
+      stylistic: {
+        commaDangle: "never",
+        braceStyle: "1tbs",
+      },
     },
   },
+
+  compatibilityDate: "2024-07-11",
 });

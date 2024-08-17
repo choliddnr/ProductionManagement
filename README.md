@@ -1,9 +1,3 @@
-# Imporvement Notes
-
-## Performance
-
-    figure out how to use hashmap instead of find() for array operation
-
 ![nuxt-ui-dashboard-social-card](https://github.com/nuxt-ui-pro/dashboard/assets/739984/f785284b-7db2-4732-af0e-2cb3c0bd7ca2)
 
 # Nuxt UI Pro - Dashboard template

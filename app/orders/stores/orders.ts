@@ -1,5 +1,5 @@
 import { defineStore, acceptHMRUpdate } from "pinia";
-import type { Order } from "~~/schemas/order.schema";
+import type { Order } from "~/schemas/order.schema";
 
 export const useOrdersStore = defineStore("orders", () => {
   const order = ref<Order>();

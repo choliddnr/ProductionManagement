@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import type { FormSubmitEvent } from "#ui/types";
-import { Confirm } from "#components";
+import { ModalConfirm } from "#components";
 import { type output as zodOutput } from "zod";
 import {
   AddItemSchema,
   EditItemSchema,
   type Item,
-  type Ingredients,
-} from "~~/schemas/item.schema";
+  // type Ingredients,
+} from "~/schemas/item.schema";
 
 const props = defineProps<{
   id?: string;
@@ -36,10 +36,10 @@ type FormSchema = zodOutput<typeof Schema>;
 const state = reactive<Partial<Item>>({
   title: undefined,
   description: undefined,
-  barcode: undefined,
   category: undefined,
-  unit: undefined,
-  ingredients: null,
+  uom: undefined,
+  for_sale: false,
+  self_produced: false,
   updated: undefined,
 });
 const { data: item } = await useFetch<Item>("/api/items", {
@@ -52,12 +52,13 @@ if (isEdit) {
   state.title = item.value.title;
   state.description = item.value.description;
   state.updated = item.value.updated;
+  state.for_sale = item.value.for_sale;
+  state.self_produced = item.value.self_produced;
   // console.log("state", state);
 }
 
 const onSubmit = async (event: FormSubmitEvent<FormSchema>) => {
-  state.ingredients = isSelfProduced.value ? ([] as Ingredients[]) : null;
-  modal.open(Confirm, {
+  modal.open(ModalModalConfirm, {
     message: isEdit ? updateMessage : createMessage,
     label: { continue: continueLabel, cancel: cancelLabel },
     onContinue: async () => {
@@ -69,6 +70,8 @@ const onSubmit = async (event: FormSubmitEvent<FormSchema>) => {
           ? {
               title: state.title,
               description: state.description,
+              for_sale: state.for_sale,
+              self_produced: state.self_produced,
               updated: state.updated,
             }
           : state,
@@ -145,15 +148,19 @@ const onSubmit = async (event: FormSubmitEvent<FormSchema>) => {
         <UFormGroup label="Description" name="description">
           <UTextarea v-model="state.description" />
         </UFormGroup>
+        <UFormGroup label="Self Produced" name="self_produced">
+          <UToggle v-model="state.self_produced" />
+        </UFormGroup>
+        <UFormGroup label="For sale" name="for_sale">
+          <UToggle v-model="state.for_sale" />
+        </UFormGroup>
+
         <div v-if="!isEdit">
           <UDivider
             label="Permanen: tidak dapat dirubah setelah disimpan!"
             :ui="{ label: 'text-red-500' }"
             size="sm"
           />
-          <UFormGroup label="Barcode" name="barcode">
-            <UInput v-model="state.barcode" type="number" />
-          </UFormGroup>
           <UFormGroup label="Category" name="category">
             <USelectMenu
               v-model="state.category"
@@ -164,11 +171,8 @@ const onSubmit = async (event: FormSubmitEvent<FormSchema>) => {
               placeholder="Categories"
             />
           </UFormGroup>
-          <UFormGroup label="Unit" name="unit">
-            <UInput v-model="state.unit" />
-          </UFormGroup>
-          <UFormGroup label="Self Produced" name="isSelfProduced">
-            <UToggle v-model="isSelfProduced" />
+          <UFormGroup label="Unit of Measurement" name="uom">
+            <UInput v-model="state.uom" />
           </UFormGroup>
         </div>
         <UButton @click="onSubmit">Submit</UButton>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Confirm } from "#components";
-import { type Item, EditItemStockSchema } from "~~/schemas/item.schema";
+import { ModalConfirm } from "#components";
+import { type Item, EditItemStockSchema } from "~/schemas/item.schema";
 
 const props = defineProps<{
   id: string;
@@ -22,7 +22,7 @@ const { fetch: updateItems } = useItemsStore();
 const { $editData } = useNuxtApp();
 
 const syncStock = (currentStock: number) => {
-  modal.open(Confirm, {
+  modal.open(ModalConfirm, {
     message: "Apakah anda yakin stok yang baru sudah sesuai?",
     label: {
       continue: "Iya, Simpan",

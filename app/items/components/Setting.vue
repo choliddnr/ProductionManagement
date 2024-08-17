@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Category, Confirm } from "#components";
-import type { ItemCategory as ItemCategoryType } from "~~/schemas/item.schema";
+import { Category, ModalConfirm } from "#components";
+import type { ItemCategory as ItemCategoryType } from "~/schemas/item.schema";
 
 const toast = useToast();
 const slideover = useSlideover();
@@ -24,7 +24,7 @@ const settings = [
 ];
 const { item_categories } = storeToRefs(useItemCategoriesStore());
 const deleteCategory = async (category: ItemCategoryType & { id: string }) => {
-  slideover.open(Confirm, {
+  slideover.open(ModalConfirm, {
     message: `Semua data terkait akan dihapus secara permanen dan tidak dapat dipulihkan. \nApakah anda yakin mau menghapus kategory ${category.title}`,
     label: {
       continue: "Hapus",

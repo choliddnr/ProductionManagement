@@ -1,5 +1,5 @@
 import { skipHydrate } from "pinia";
-import type { Category } from "~~/schemas/types";
+import type { Category } from "~/schemas/types";
 
 export const useItemCategoriesStore = defineStore("item_categories", () => {
   const storename = "item_categories";
@@ -15,7 +15,7 @@ export const useItemCategoriesStore = defineStore("item_categories", () => {
         "item_categories"
       ).then((val) => val);
       if (item_categories.value.length === 0) {
-        await $fetch("/api/item_categories", {
+        await $fetch("/api/items/categories", {
           onResponse: async ({ response }) => {
             item_categories.value = response._data;
             await $addData(storename, item_categories.value);

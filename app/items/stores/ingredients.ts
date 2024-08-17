@@ -1,25 +1,25 @@
 import { defineStore, acceptHMRUpdate } from "pinia";
-import type { Ingredients, Item } from "~~/schemas/item.schema";
+import type { Ingredients, Item } from "~/schemas/item.schema";
 
 export const useIngredientsStore = defineStore("ingredients", () => {
-  const product = ref<string>();
+  const selfProducedItem = ref<string>();
   const ingredients = ref<Partial<(Ingredients & { info: Item })[]>>();
   const { itemsMap } = storeToRefs(useItemsStore());
   const fetch = async () => {
     await $fetch<Ingredients[]>("/api/items/ingredients", {
       method: "get",
       params: {
-        id: product.value,
+        id: selfProducedItem.value,
       },
       onResponse: ({ response }) => {
         let x: (Ingredients & { info: Item; id: string })[] = [];
         response._data.forEach((ing: Ingredients) => {
           x.push({
             id: ing.id,
-            item: ing.item,
-            qty: ing.qty,
+            ingredient: ing.ingredient,
+            quantity: ing.quantity,
             substitutes: ing.substitutes,
-            info: itemsMap.value.get(ing.item),
+            info: itemsMap.value.get(ing.ingredient),
           });
         });
         ingredients.value = x;
@@ -27,7 +27,7 @@ export const useIngredientsStore = defineStore("ingredients", () => {
     });
   };
 
-  return { ingredients, product, fetch };
+  return { ingredients, selfProducedItem, fetch };
 });
 
 if (import.meta.hot) {

@@ -1,6 +1,11 @@
 <script setup lang="ts">
-import { type Item, itemCategories } from "~~/schemas/item.schema";
-import { LazyForm, LazyConfirm, LazyStock, LazyIngredients } from "#components";
+import { type Item, itemCategories } from "~/schemas/item.schema";
+import {
+  LazyForm,
+  LazyModalConfirm,
+  LazyStock,
+  LazyIngredients,
+} from "#components";
 
 const { itemsTable, selectedCategories, sort, onWorkingItem } = storeToRefs(
   useItemsTableStore()
@@ -18,10 +23,6 @@ const defaultColumns = [
   {
     key: "stock",
     label: "Stock",
-  },
-  {
-    key: "forecast",
-    label: "Forecast",
   },
   {
     key: "category",
@@ -108,14 +109,34 @@ const onDelete = async (id: string, lastUpdate: Date) => {
         <span class="text-gray-900 dark:text-white font-medium">{{
           row.title
         }}</span>
+        <!-- :ui="{ rounded: 'rounded-full' }" -->
         <UButton
-          v-if="row.ingredients != null"
+          v-if="row.self_produced"
           variant="ghost"
-          class="p-0"
-          :ui="{ rounded: 'rounded-full' }"
+          class="px-2"
+          size="2xs"
           @click="
             slideover.open(LazyIngredients, {
-              productId: row.id,
+              selfProducedItemId: row.id,
+              onClose: () => {
+                // console.log('closse slideover');
+
+                slideover.close();
+              },
+            })
+          "
+        >
+          SP
+        </UButton>
+        <UButton
+          v-if="row.for_sale"
+          variant="ghost"
+          class="px-2"
+          size="2xs"
+          color="green"
+          @click="
+            slideover.open(LazyIngredients, {
+              selfProducedItemId: row.id,
               onClose: () => {
                 // console.log('closse slideover');
 
@@ -125,14 +146,14 @@ const onDelete = async (id: string, lastUpdate: Date) => {
           "
         >
           <UIcon
-            name="i-heroicons-information-circle"
+            name="i-heroicons-building-storefront-solid"
             class="w-5 h-5"
             color="blue"
           />
         </UButton>
       </div>
     </template>
-    <template #forecast-data="{ row }">
+    <!-- <template #forecast-data="{ row }">
       <div class="flex items-center gap-3">
         <UBadge
           :label="parseFloat(row.forecast).toFixed(2)"
@@ -144,7 +165,7 @@ const onDelete = async (id: string, lastUpdate: Date) => {
           {{ row.unit }}</span
         >
       </div>
-    </template>
+    </template> -->
     <template #stock-data="{ row }">
       <div class="flex items-center gap-3">
         <UButton
@@ -169,7 +190,7 @@ const onDelete = async (id: string, lastUpdate: Date) => {
           size="xs"
         />
         <span class="text-gray-900 dark:text-white font-bold">
-          {{ row.unit }}</span
+          {{ row.uom }}</span
         >
       </div>
     </template>
@@ -210,7 +231,7 @@ const onDelete = async (id: string, lastUpdate: Date) => {
             @click="
               () => {
                 onWorkingItem = row;
-                modal.open(LazyConfirm, {
+                modal.open(LazyModalConfirm, {
                   message: deleteMessage,
                   label: {
                     continue: continueDeleteLabel,

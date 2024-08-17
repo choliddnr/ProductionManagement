@@ -1,5 +1,5 @@
 import { skipHydrate } from "pinia";
-import type { Item, ItemsTable } from "~~/schemas/item.schema";
+import type { Item, ItemsTable } from "~/schemas/item.schema";
 
 export const useItemsStore = defineStore("items", () => {
   const { $getData, $addData } = useNuxtApp();

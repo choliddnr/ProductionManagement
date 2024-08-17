@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import Confirm from "./Confirm.vue";
+import ModalConfirm from "../../base/components/ModalModalConfirm.vue";
 
 /**
  * Define Variable
  */
 
 const props = defineProps<{
-  productId: string;
+  selfProducedItemId: string;
 }>();
 const emits = defineEmits(["close"]);
 const { itemsMap } = storeToRefs(useItemsStore());
-const { ingredients, product } = storeToRefs(useIngredientsStore());
+const { ingredients, selfProducedItem } = storeToRefs(useIngredientsStore());
 const { fetch: fetchIng } = useIngredientsStore();
 const showForm = ref<boolean>(false);
 const ingIdToEdit = ref<string>();
@@ -36,7 +36,7 @@ const editIngredient = async (ingId: string) => {
 };
 
 const onDelete = (index: number, ingId: string) => {
-  modal.open(Confirm, {
+  modal.open(ModalConfirm, {
     message: "Apakah anda yakin?",
     label: {
       continue: "Iya",
@@ -59,7 +59,7 @@ const onDelete = (index: number, ingId: string) => {
 };
 
 onBeforeMount(async () => {
-  product.value = props.productId;
+  selfProducedItem.value = props.selfProducedItemId;
   await fetchIng();
 });
 </script>
@@ -72,7 +72,7 @@ onBeforeMount(async () => {
       <h3
         class="text-base font-semibold leading-6 text-gray-900 dark:text-white col-span-10"
       >
-        Komposisi: {{ itemsMap.get(productId).title }}
+        Komposisi: {{ itemsMap.get(selfProducedItemId).title }}
       </h3>
       <div class="col-span-2">
         <UTooltip text="Tambah Bahan" :popper="{ arrow: true }"
@@ -102,8 +102,8 @@ onBeforeMount(async () => {
     <Transition>
       <IngredientForm
         :ing-id="ingIdToEdit"
-        :product-id="productId"
-        :other-ing="ingredients.map((i) => i.item)"
+        :self-produced-item-id="selfProducedItemId"
+        :other-ing="ingredients.map((i) => i.ingredient)"
         v-if="showForm"
         @close="showForm = false"
       />
@@ -122,7 +122,7 @@ onBeforeMount(async () => {
           <span class="text-gray-900 dark:text-white font-semibold"
             >{{ ing.info.title }}
             <UBadge color="gray" :ui="{ rounded: 'rounded-full' }"
-              >{{ ing.qty.toString() }} {{ ing.info.unit }}</UBadge
+              >{{ ing.quantity.toString() }} {{ ing.info.uom }}</UBadge
             >
           </span>
         </template>

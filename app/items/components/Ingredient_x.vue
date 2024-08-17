@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import type { FormSubmitEvent } from "#ui/types";
-import { Confirm } from "#components";
+import { ModalConfirm } from "#components";
 import { type output as zodOutput } from "zod";
 import {
   IngredientsSchema,
   type Ingredients,
   type Item,
-} from "~~/schemas/item.schema";
+} from "~/schemas/item.schema";
 
 const props = defineProps<{
   productId: string;
@@ -16,7 +16,7 @@ const emits = defineEmits<{
   close: [];
 }>();
 const item = ref<Item>();
-const ingredients = ref<Partial<(Ingredients & { item: Item })[]>>()
+const ingredients = ref<Partial<(Ingredients & { item: Item })[]>>();
 await useFetch<Ingredients>("/api/items/ingredients", {
   method: "GET",
   query: {
@@ -70,9 +70,9 @@ const update = async () => {
   if (showForm.value) showForm.value = false;
   await $fetch("/api/items", {
     method: "PATCH",
-    params: { 
+    params: {
       product: props.productId,
-      item: state.item
+      item: state.item,
     },
     body: {
       qty: state.qty,
@@ -124,7 +124,7 @@ const editIngredient = async (index: number) => {
 };
 
 // const onSubmit = async (event: FormSubmitEvent<FormSchema>) => {
-//   modal.open(Confirm, {
+//   modal.open(ModalConfirm, {
 //     message: message,
 //     label: { continue: continueLabel, cancel: cancelLabel },
 //     onContinue: async () => {
@@ -149,7 +149,7 @@ const editIngredient = async (index: number) => {
     prevent-close
     :ui="{ header: { base: 'grid grid-cols-12' } }"
   >
- <!--   <template #header>
+    <!--   <template #header>
       <h3
         class="text-base font-semibold leading-6 text-gray-900 dark:text-white col-span-10"
       >
@@ -325,7 +325,7 @@ Form
             size="2xs"
             @click="
               () => {
-                modal.open(Confirm, {
+                modal.open(ModalConfirm, {
                   message: 'Apakah anda yakin?',
                   label: {
                     continue: 'Iya',

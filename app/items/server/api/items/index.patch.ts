@@ -1,4 +1,4 @@
-import { type ItemsTable } from "~~/schemas/item.schema";
+import { type ItemsTable } from "~/schemas/item.schema";
 
 export default defineEventHandler(async (e) => {
   const id = getQuery(e).id as string;

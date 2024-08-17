@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { Form } from "#components";
-import type { Item } from "~~/schemas/item.schema";
+import type { Item } from "~/schemas/item.schema";
 
 const { item_categories } = storeToRefs(useItemCategoriesStore());
 const { items } = storeToRefs(useItemsStore());
@@ -17,6 +17,8 @@ const isOpen = ref<boolean>(false);
 const slideover = useSlideover();
 const item = ref<Item>();
 const openAddForm = () => {
+  console.log("open form");
+
   slideover.open(Form, {
     onClose: slideover.close,
   });

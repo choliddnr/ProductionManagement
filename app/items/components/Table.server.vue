@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type Item, itemCategories } from "~~/schemas/item.schema";
+import { type Item, itemCategories } from "~/schemas/item.schema";
 const defaultColumns = [
   {
     key: "title",
