@@ -6,6 +6,7 @@ export default defineNuxtConfig({
     "app/items",
     "app/customers",
     "app/orders",
+    "app/products",
   ],
 
   modules: [
@@ -21,7 +22,7 @@ export default defineNuxtConfig({
       "./app/items/stores",
       "./app/orders/stores",
       "./app/customers/stores",
-      // "./app/products/stores",
+      "./app/products/stores",
     ],
   },
 

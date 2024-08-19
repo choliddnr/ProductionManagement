@@ -21,7 +21,8 @@ export const useProductsStore = defineStore("products", () => {
       };
     });
   });
-  return { products, fetch };
+  const product = ref<Product>();
+  return { products, product, fetch };
 });
 
 if (import.meta.hot) {
