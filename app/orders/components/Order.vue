@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { LazyModalConfirm } from "#components";
-import { orderStatuses } from "~/schemas/order.schema";
+import { orderStatuses, type OrderProducts } from "~/schemas/order.schema";
 
 const emits = defineEmits<{
   close: [];
@@ -13,6 +13,20 @@ const { order_products } = storeToRefs(useOrderProductsStore());
 const { order, orders } = storeToRefs(useOrdersStore());
 const { itemsMap } = storeToRefs(useItemsStore());
 const status = ref<string>(order.value.status);
+
+const ordered_products = computed<(OrderProducts & { title?: string })[]>(
+  () => {
+    if (!order_products.value || itemsMap.value.size === 0) return [];
+    return order_products.value.map((p) => {
+      if (!itemsMap.value || !p.product) return p;
+      const item = itemsMap.value.get(p.product);
+      return {
+        ...p,
+        title: item.title || " ",
+      };
+    });
+  }
+);
 
 const updateReadiness = async (id: string, readiness: boolean) => {
   modal.open(LazyModalConfirm, {
@@ -123,11 +137,8 @@ const updateStatus = async () => {
         </div>
       </UFormGroup>
       <UDivider class="mt-5" />
-      <div v-for="product in order_products" class="mt-5">
-        <UDashboardSection
-          :description="product.note"
-          :title="itemsMap.get(product.product).title"
-        >
+      <div v-for="product in ordered_products" class="mt-5">
+        <UDashboardSection :description="product.note" :title="product.title">
           <template #links>
             <UBadge :label="product.quantity" variant="outline" color="white" />
             <UButton

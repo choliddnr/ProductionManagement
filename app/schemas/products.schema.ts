@@ -14,3 +14,7 @@ export const ProductsSchema = z.object({
 });
 
 export type Product = Item & Omit<z.infer<typeof ProductsSchema>, "id">;
+export type BaseProduct = Pick<
+  Product,
+  "id" | "cogc" | "cogc_params" | "price"
+>;

@@ -4,6 +4,8 @@ import { format } from "date-fns";
 import { id } from "date-fns/locale";
 const { itemsMap } = storeToRefs(useItemsStore());
 const { products, product } = storeToRefs(useProductsStore());
+console.log("on products", products.value);
+
 const searchProduct = ref<string>();
 const searchProductForm = ref<string>();
 const slideover = useSlideover();

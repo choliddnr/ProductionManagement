@@ -1,17 +1,27 @@
-import { defineStore, acceptHMRUpdate } from "pinia";
+import { defineStore, acceptHMRUpdate, skipHydrate } from "pinia";
 import type { Item } from "~/schemas/item.schema";
-import { type Product } from "~/schemas/products.schema";
+import { type BaseProduct, type Product } from "~/schemas/products.schema";
 
 export const useProductsStore = defineStore("products", () => {
   const isDependenciesReady = ref<boolean>(false);
   const { itemsMap } = storeToRefs(useItemsStore());
-  const { data, execute: fetch } = useFetch<
-    Pick<Product, "id" | "cogc" | "cogc_params" | "price">[]
-  >("/api/orders/for_sale_products");
 
+  const baseProducts = ref<BaseProduct[]>();
+  const { execute: fetch } = useFetch<BaseProduct[]>(
+    "/api/orders/for_sale_products",
+    {
+      onResponse: ({ response }) => {
+        baseProducts.value = response._data;
+        console.log("on response", baseProducts.value);
+      },
+    }
+  );
+  const addNewProduct = (newData: BaseProduct) =>
+    baseProducts.value.push(newData);
   const products = computed<Product[]>(() => {
-    if (!(itemsMap.value && data.value)) return;
-    return data.value.map((p) => {
+    console.log("computing", baseProducts.value, itemsMap.value);
+    if (!(itemsMap.value && baseProducts.value)) return;
+    return baseProducts.value.map((p) => {
       let item: Item = itemsMap.value.get(p.id);
       return {
         ...item,
@@ -21,8 +31,18 @@ export const useProductsStore = defineStore("products", () => {
       };
     });
   });
+  // watchEffect(() => {
+  //   console.log("watch", baseProducts.value, itemsMap.value);
+  // });
+
   const product = ref<Product>();
-  return { products, product, fetch };
+  return {
+    products: skipHydrate(products),
+    product,
+    baseProducts,
+    fetch,
+    addNewProduct,
+  };
 });
 
 if (import.meta.hot) {

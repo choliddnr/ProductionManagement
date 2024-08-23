@@ -11,6 +11,7 @@ const toast = useToast();
 
 const { items } = storeToRefs(useItemsStore());
 const { products } = storeToRefs(useProductsStore());
+const { addNewProduct } = useProductsStore();
 
 type State = Pick<Product, "id" | "cogc" | "price" | "cogc_params">;
 const state = reactive<State>({
@@ -45,7 +46,7 @@ const onSubmit = async () => {
         method: "POST",
         body: state,
         onResponse: ({ response }) => {
-          products.value.push(response._data);
+          addNewProduct(response._data);
           toast.add({
             description: "Pesanan berhasil dibuat",
           });
