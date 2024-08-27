@@ -1,12 +1,8 @@
 <script setup lang="ts">
 import { type Item, itemCategories } from "~/schemas/item.schema";
-import {
-  LazyForm,
-  LazyModalConfirm,
-  LazyStock,
-  LazyIngredients,
-} from "#components";
+import { LazyForm, LazyModalConfirm, LazyStock } from "#components";
 
+// LazyIngredients,
 const { itemsTable, selectedCategories, sort, onWorkingItem } = storeToRefs(
   useItemsTableStore()
 );
@@ -104,12 +100,11 @@ const onDelete = async (id: string, lastUpdate: Date) => {
     :ui="{ divide: 'divide-gray-200 dark:divide-gray-800' }"
     @select="onSelect"
   >
-    <template #title-data="{ row }">
+    <!-- <template #title-data="{ row }">
       <div class="flex items-center gap-3">
         <span class="text-gray-900 dark:text-white font-medium">{{
           row.title
         }}</span>
-        <!-- :ui="{ rounded: 'rounded-full' }" -->
         <UButton
           v-if="row.self_produced"
           variant="ghost"
@@ -119,7 +114,6 @@ const onDelete = async (id: string, lastUpdate: Date) => {
             slideover.open(LazyIngredients, {
               selfProducedItemId: row.id,
               onClose: () => {
-                // console.log('closse slideover');
 
                 slideover.close();
               },
@@ -138,7 +132,6 @@ const onDelete = async (id: string, lastUpdate: Date) => {
             slideover.open(LazyIngredients, {
               selfProducedItemId: row.id,
               onClose: () => {
-                // console.log('closse slideover');
 
                 slideover.close();
               },
@@ -152,7 +145,7 @@ const onDelete = async (id: string, lastUpdate: Date) => {
           />
         </UButton>
       </div>
-    </template>
+    </template> -->
     <!-- <template #forecast-data="{ row }">
       <div class="flex items-center gap-3">
         <UBadge

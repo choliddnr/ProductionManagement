@@ -46,7 +46,10 @@ const searchDebounch = useDebounceFn(
 <template>
   <UDashboardPage>
     <UDashboardPanel grow>
-      <UDashboardNavbar title="Orders" :badge="products ? products.length : 0">
+      <UDashboardNavbar
+        title="Products"
+        :badge="products ? products.length : 0"
+      >
         <template #right>
           <!-- ref="searchItem" -->
           <UInput

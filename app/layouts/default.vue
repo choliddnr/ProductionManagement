@@ -48,6 +48,17 @@ const links = [
     },
   },
   {
+    id: "production",
+    label: "Production",
+    icon: "i-heroicons-cube-transparent-20-solid",
+    to: "/production",
+    badge: "4",
+    tooltip: {
+      text: "Item",
+      shortcuts: ["G", "I"],
+    },
+  },
+  {
     id: "inbox",
     label: "Inbox",
     icon: "i-heroicons-inbox",

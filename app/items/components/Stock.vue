@@ -83,7 +83,7 @@ const syncStock = (currentStock: number) => {
         class="space-y-4"
       >
         <UBadge size="md" variant="outline"
-          >Stock sekarang: {{ item.stock.toFixed(2) }} {{ item.unit }}</UBadge
+          >Stock sekarang: {{ item.stock.toFixed(2) }} {{ item.uom }}</UBadge
         >
         <UFormGroup label="Stock terbaru" name="newStock">
           <UInput v-model="stockState.stock" type="number" />

@@ -12,14 +12,12 @@ export const useProductsStore = defineStore("products", () => {
     {
       onResponse: ({ response }) => {
         baseProducts.value = response._data;
-        console.log("on response", baseProducts.value);
       },
     }
   );
   const addNewProduct = (newData: BaseProduct) =>
     baseProducts.value.push(newData);
   const products = computed<Product[]>(() => {
-    console.log("computing", baseProducts.value, itemsMap.value);
     if (!(itemsMap.value && baseProducts.value)) return;
     return baseProducts.value.map((p) => {
       let item: Item = itemsMap.value.get(p.id);

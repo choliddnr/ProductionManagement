@@ -38,8 +38,6 @@ const state = reactive<Partial<Item>>({
   description: undefined,
   category: undefined,
   uom: undefined,
-  for_sale: false,
-  self_produced: false,
   updated: undefined,
 });
 const { data: item } = await useFetch<Item>("/api/items", {
@@ -52,13 +50,11 @@ if (isEdit) {
   state.title = item.value.title;
   state.description = item.value.description;
   state.updated = item.value.updated;
-  state.for_sale = item.value.for_sale;
-  state.self_produced = item.value.self_produced;
   // console.log("state", state);
 }
 
 const onSubmit = async (event: FormSubmitEvent<FormSchema>) => {
-  modal.open(ModalModalConfirm, {
+  modal.open(ModalConfirm, {
     message: isEdit ? updateMessage : createMessage,
     label: { continue: continueLabel, cancel: cancelLabel },
     onContinue: async () => {
@@ -70,8 +66,6 @@ const onSubmit = async (event: FormSubmitEvent<FormSchema>) => {
           ? {
               title: state.title,
               description: state.description,
-              for_sale: state.for_sale,
-              self_produced: state.self_produced,
               updated: state.updated,
             }
           : state,
@@ -147,12 +141,6 @@ const onSubmit = async (event: FormSubmitEvent<FormSchema>) => {
         </UFormGroup>
         <UFormGroup label="Description" name="description">
           <UTextarea v-model="state.description" />
-        </UFormGroup>
-        <UFormGroup label="Self Produced" name="self_produced">
-          <UToggle v-model="state.self_produced" />
-        </UFormGroup>
-        <UFormGroup label="For sale" name="for_sale">
-          <UToggle v-model="state.for_sale" />
         </UFormGroup>
 
         <div v-if="!isEdit">
