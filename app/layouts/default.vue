@@ -14,39 +14,39 @@ const links = [
       shortcuts: ["G", "H"],
     },
   },
-  {
-    id: "items",
-    label: "Items",
-    icon: "i-heroicons-table-cells-20-solid",
-    to: "/items",
-    badge: "4",
-    tooltip: {
-      text: "Item",
-      shortcuts: ["G", "I"],
-    },
-  },
-  {
-    id: "orders",
-    label: "Orders",
-    icon: "i-heroicons-document-text-20-solid",
-    to: "/orders",
-    badge: "4",
-    tooltip: {
-      text: "Item",
-      shortcuts: ["G", "I"],
-    },
-  },
-  {
-    id: "products",
-    label: "Products",
-    icon: "i-heroicons-cube-20-solid",
-    to: "/products",
-    badge: "4",
-    tooltip: {
-      text: "Item",
-      shortcuts: ["G", "I"],
-    },
-  },
+  // {
+  //   id: "items",
+  //   label: "Items",
+  //   icon: "i-heroicons-table-cells-20-solid",
+  //   to: "/items",
+  //   badge: "4",
+  //   tooltip: {
+  //     text: "Item",
+  //     shortcuts: ["G", "I"],
+  //   },
+  // },
+  // {
+  //   id: "orders",
+  //   label: "Orders",
+  //   icon: "i-heroicons-document-text-20-solid",
+  //   to: "/orders",
+  //   badge: "4",
+  //   tooltip: {
+  //     text: "Item",
+  //     shortcuts: ["G", "I"],
+  //   },
+  // },
+  // {
+  //   id: "products",
+  //   label: "Products",
+  //   icon: "i-heroicons-cube-20-solid",
+  //   to: "/products",
+  //   badge: "4",
+  //   tooltip: {
+  //     text: "Item",
+  //     shortcuts: ["G", "I"],
+  //   },
+  // },
   {
     id: "production",
     label: "Production",
@@ -153,13 +153,13 @@ const defaultColors = ref(
   ["green", "teal", "cyan", "sky", "blue", "indigo", "violet"].map((color) => ({
     label: color,
     chip: color,
-    click: () => (appConfig.ui.primary = color),
+    click: () => ((appConfig.ui as any).primary = color),
   }))
 );
 const colors = computed(() =>
   defaultColors.value.map((color) => ({
     ...color,
-    active: appConfig.ui.primary === color.label,
+    active: (appConfig.ui as any).primary === color.label,
   }))
 );
 </script>

@@ -33,7 +33,8 @@ const syncStock = (currentStock: number) => {
         method: "PATCH",
         params: { id: item.value.id },
         body: {
-          stock: stockState.stock - currentStock,
+          newStock: stockState.stock,
+          currentStock: currentStock,
           description: stockState.description,
           updated: item.value.updated,
         },

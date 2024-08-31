@@ -1,20 +1,31 @@
 <script setup lang="ts">
+import { LazyProductionForm } from "#components";
+
+const { selfProduced, hotUpdate } = storeToRefs(useSelfProducedStore());
+const searchProduct = ref<string>();
+const searchProductForm = ref<string>();
+const slideover = useSlideover();
 const searchDebounch = useDebounceFn(
   () => {
-    searchCustomer.value = searchCustomerForm.value;
+    searchProduct.value = searchProductForm.value;
   },
   1500,
   { maxWait: 5000 }
 );
+
+const appConfig = useAppConfig();
 </script>
 <template>
   <UDashboardPage>
     <UDashboardPanel grow>
-      <UDashboardNavbar title="Orders" :badge="orders ? orders.length : 0">
+      <UDashboardNavbar
+        title="Self Produced Products"
+        :badge="selfProduced.length || 0"
+      >
         <template #right>
           <!-- ref="searchItem" -->
           <UInput
-            v-model="searchCustomerForm"
+            v-model="searchProductForm"
             @keyup="searchDebounch"
             icon="i-heroicons-funnel"
             autocomplete="off"
@@ -28,13 +39,21 @@ const searchDebounch = useDebounceFn(
           </UInput>
 
           <UButton
-            label="New Order"
+            label="Tambah"
             trailing-icon="i-heroicons-plus"
             color="gray"
-            @click="openAddForm"
+            @click="
+              () => {
+                slideover.open(LazyProductionForm, {
+                  onClose: () => {
+                    slideover.close();
+                  },
+                });
+              }
+            "
           />
         </template>
       </UDashboardNavbar>
-      <ProductionSelfProducedProducts /> </UDashboardPanel
+      <ProductionSelfProduced /> </UDashboardPanel
   ></UDashboardPage>
 </template>

@@ -3,10 +3,10 @@ export default defineNuxtConfig({
   extends: [
     "@nuxt/ui-pro",
     "app/base",
-    "app/items",
-    "app/customers",
-    "app/orders",
-    "app/products",
+    // "app/items",
+    // "app/customers",
+    // "app/orders",
+    // "app/products",
     "app/production",
   ],
 
@@ -20,10 +20,10 @@ export default defineNuxtConfig({
 
   pinia: {
     storesDirs: [
-      "./app/items/stores",
-      "./app/orders/stores",
-      "./app/customers/stores",
-      "./app/products/stores",
+      // "./app/items/stores",
+      // "./app/orders/stores",
+      // "./app/customers/stores",
+      // "./app/products/stores",
       "./app/production/stores",
     ],
   },
@@ -64,4 +64,15 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: "2024-07-11",
+  nitro: {
+    storage: {
+      memory: {
+        driver: "memory",
+      },
+      disk: {
+        driver: "fs",
+        base: "./data",
+      },
+    },
+  },
 });
