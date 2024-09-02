@@ -4,7 +4,8 @@ import {
   type Ingredients,
   type Item,
 } from "~/schemas/item.schema";
-import ModalConfirm from "../../base/components/ModalModalConfirm.vue";
+import type { ItemInfo } from "../types";
+import { LazyModalConfirm } from "#components";
 
 /**
  * Define Variable
@@ -12,7 +13,7 @@ import ModalConfirm from "../../base/components/ModalModalConfirm.vue";
 const props = defineProps<{
   ingId: string | undefined;
   otherIng: string[];
-  selfProducedItemId: string;
+  selfProducedProduct: string;
 }>();
 const { ingredients } = storeToRefs(useIngredientsStore());
 const emits = defineEmits(["close"]);
@@ -20,28 +21,34 @@ const modal = useModal();
 const message = "Apakah anda yakin data yang anda masukan sudah benar?";
 const continueLabel = "Iya, Simpan";
 const cancelLabel = "Tinjau kembali";
-const { itemsMap, items } = storeToRefs(useItemsStore());
-const state = reactive<Partial<Ingredients & { updated: Date }>>({
+// const { itemsMap, items } = storeToRefs(useItemsStore());
+
+const state = reactive<Ingredients & { updated: Date }>({
   id: undefined,
   ingredient: undefined,
+  self_produced_item: props.selfProducedProduct,
   quantity: undefined,
   substitutes: [],
   updated: undefined,
 });
+console.log("self_produced_item", state.self_produced_item);
+
+const { data: itemInfo } = useFetch<ItemInfo[]>("/api/production/item_info");
 const options = computed(() => {
-  return items.value.filter(
+  if (!itemInfo.value) return [];
+  return itemInfo.value.filter(
     (e) =>
       ![
         ...props.otherIng.filter((i) => i != state.ingredient),
         props.ingId,
-        props.selfProducedItemId,
+        props.selfProducedProduct,
       ].includes(e.id)
   );
 });
 
 if (props.ingId) {
   const { refresh } = await useFetch<Ingredients>(
-    "/api/items/ingredients/one",
+    "/api/production/ingredients/one",
     {
       method: "get",
       params: { id: props.ingId },
@@ -65,14 +72,14 @@ if (props.ingId) {
  * Func
  */
 const onSubmit = async () => {
-  modal.open(ModalConfirm, {
+  modal.open(LazyModalConfirm, {
     message: message,
     label: { continue: continueLabel, cancel: cancelLabel },
     onContinue: async () => {
-      await $fetch("/api/items/ingredients", {
+      await $fetch("/api/production/ingredients", {
         method: props.ingId ? "PUT" : "POST",
         body: {
-          self_produced_item: props.selfProducedItemId,
+          self_produced_item: props.selfProducedProduct,
           ingredient: state.ingredient,
           quantity: state.quantity,
           substitutes: state.substitutes,
@@ -87,7 +94,7 @@ const onSubmit = async () => {
               return i.id == props.ingId
                 ? {
                     id: response._data.id,
-                    self_produced_item: props.selfProducedItemId,
+                    self_produced_item: props.selfProducedProduct,
                     ingredient: response._data.item,
                     quantity: response._data.quantity,
                     substitutes: response._data.substitutes,
@@ -98,11 +105,13 @@ const onSubmit = async () => {
           } else {
             ingredients.value.push({
               id: response._data.id,
-              self_produced_item: props.selfProducedItemId,
+              self_produced_item: props.selfProducedProduct,
               ingredient: response._data.ingredient,
               quantity: response._data.quantity,
               substitutes: response._data.substitutes,
-              info: itemsMap.value.get(response._data.ingredient),
+              info: itemInfo.value.find(
+                (i) => i.id === response._data.ingredient
+              ),
             });
           }
         },
@@ -117,7 +126,12 @@ const editIngredient = async () => {};
 </script>
 
 <template>
-  <UForm :schema="IngredientsSchema" :state="state" class="space-y-4">
+  <UForm
+    :schema="IngredientsSchema"
+    :state="state"
+    class="space-y-4"
+    @submit="onSubmit"
+  >
     <!-- v-if="showForm" -->
     <div class="grid grid-cols-3 gap-2">
       <UFormGroup label="Bahan" name="ingredient" class="col-span-2">
@@ -146,7 +160,8 @@ const editIngredient = async () => {};
           class="mb-1"
           :placeholder="
             state.ingredient
-              ? ' % setiap ' + itemsMap.get(state.ingredient).uom
+              ? ' % setiap ' +
+                itemInfo.find((i) => i.id === state.ingredient).uom
               : ' '
           "
         />
@@ -160,7 +175,7 @@ const editIngredient = async () => {};
             variant="soft"
             size="xs"
           >
-            {{ itemsMap.get(sub).title }}
+            {{ itemInfo.find((i) => i.id === sub).title }}
             <UButton
               size="2xs"
               icon="i-heroicons-x-mark-20-solid"
@@ -196,9 +211,7 @@ const editIngredient = async () => {};
       </UFormGroup>
     </div>
     <div class="grid grid-cols-2 gap-2 place-items-stretch">
-      <UButton @click="onSubmit" type="submit" class="justify-center"
-        >Submit</UButton
-      >
+      <UButton type="submit" class="justify-center">Submit</UButton>
       <UButton @click="emits('close')" class="justify-center" color="red"
         >Cancel</UButton
       >

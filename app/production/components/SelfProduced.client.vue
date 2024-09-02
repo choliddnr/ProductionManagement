@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { LazyModalConfirm } from "#components";
+import {
+  LazyModalConfirm,
+  LazyProductionForm,
+  LazyProductionIngredients,
+} from "#components";
 
 // import { type Item, itemCategories } from "~/schemas/item.schema";
 // import { LazyForm, LazyModalConfirm, LazyStock } from "#components";
@@ -9,12 +13,14 @@ import { LazyModalConfirm } from "#components";
 // );
 const modal = useModal();
 const toast = useToast();
+const slideover = useSlideover();
 
 const deleteMessage = "Apakah anda yakin akan menghapus data ini?";
 const continueDeleteLabel = "Proses";
 const cancelDeleteLabel = "Batal";
 
 const { selfProduced, sort } = storeToRefs(useSelfProducedStore());
+const { selfProducedProduct } = storeToRefs(useIngredientsStore());
 
 /**
  * Define table columns
@@ -85,62 +91,41 @@ const onDelete = async (id: string) => {
     class="w-full"
     :ui="{ divide: 'divide-gray-200 dark:divide-gray-800' }"
   >
-    <!-- <template #stock-data="{ row }">
-      <div class="flex items-center gap-3">
-        <UButton
-          size="2xs"
-          variant="ghost"
-          icon="i-heroicons-arrow-path"
-          @click="
-            () => {
-              slideover.open(LazyStock, {
-                id: row.id,
-                onClose: () => {
-                  slideover.close();
-                },
-              });
-            }
-          "
-        />
-        <UBadge
-          :label="parseFloat(row.stock).toFixed(2)"
-          variant="soft"
-          :color="parseFloat(row.stock) <= 5 ? 'red' : 'primary'"
-          size="xs"
-        />
-        <span class="text-gray-900 dark:text-white font-bold">
-          {{ row.uom }}</span
-        >
-      </div>
-    </template>
-
-    <template #category-data="{ row }">
-      <UBadge
-        :label="row.category_info.title"
-        :color="row.category_info.color"
-        variant="subtle"
-        class="capitalize"
-      />
-    </template> -->
     <template #actions-data="{ row }">
       <div class="flex gap-2">
         <div class="flex-none">
           <UButton
             size="2xs"
+            color="green"
+            icon="i-heroicons-clipboard-document-list-solid"
+            @click="
+              () => {
+                selfProducedProduct = row.item;
+                slideover.open(LazyProductionIngredients, {
+                  onClose: () => {
+                    slideover.close();
+                  },
+                });
+              }
+            "
+          />
+        </div>
+        <div class="flex-none">
+          <UButton
+            size="2xs"
             color="primary"
             icon="i-heroicons-pencil-square"
+            @click="
+              () => {
+                slideover.open(LazyProductionForm, {
+                  update: { id: row.id, title: row.item_title },
+                  onClose: () => {
+                    slideover.close();
+                  },
+                });
+              }
+            "
           />
-          <!-- @click="
-                () => {
-                  onWorkingItem = row;
-                  slideover.open(LazyForm, {
-                    id: row.id,
-                    onClose: () => {
-                      slideover.close();
-                    },
-                  });
-                }
-              " -->
         </div>
         <div class="flex-none">
           <UButton

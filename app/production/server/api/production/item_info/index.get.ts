@@ -10,8 +10,8 @@
 // });
 import { snapshot, prefixStorage } from "unstorage";
 import type { SelfProduced } from "~/types/self_produced";
-import type { FullSelfProduced, ItemOption } from "~/production/types";
-import { memoryStorage } from "../../utils/storage";
+import type { FullSelfProduced, ItemInfo } from "~/production/types";
+import { memoryStorage } from "../../../utils/storage";
 import type { Item } from "~/types/items";
 import type { Cache } from "~/types";
 
@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
       if (Object.keys(savedSPPs).length > 0) return Object.values(savedSPPs);
     }
   }
-  console.log("refetch item_options");
+  console.log("refetch item_info");
 
   /**
    * Get data from pb Backend
@@ -49,18 +49,19 @@ export default defineEventHandler(async (event) => {
     .collection("items")
     .getFullList()) as Item[];
 
-  const self_produced = await $fetch<FullSelfProduced[]>(
-    "/api/production/self_produced"
-  );
-  const self_produced_item_list = self_produced.map((sp) => sp.item);
+  // const self_produced = await $fetch<FullSelfProduced[]>(
+  //   "/api/production/self_produced"
+  // );
+  // const self_produced_item_list = self_produced.map((sp) => sp.item);
 
-  const filtered_items = items.filter(
-    (i) => !self_produced_item_list.includes(i.id)
-  );
-  const res: ItemOption[] = filtered_items.map((i) => {
+  // const filtered_items = items.filter(
+  //   (i) => !self_produced_item_list.includes(i.id)
+  // );
+  const res: ItemInfo[] = items.map((i) => {
     return {
       id: i.id,
       title: i.title as string,
+      uom: i.uom,
     };
   });
 

@@ -1,7 +1,7 @@
 import { snapshot, prefixStorage } from "unstorage";
 import type { SelfProduced } from "~/types/self_produced";
 import type { FullSelfProduced } from "~/production/types";
-import { memoryStorage } from "../../utils/storage";
+import { memoryStorage } from "../../../utils/storage";
 
 const group = "self_produced";
 const metaStorage = prefixStorage(memoryStorage, `${group}_meta`);

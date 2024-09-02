@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { ProductsSchema, type Product } from "~/schemas/products.schema";
-import { format } from "date-fns";
-import { id } from "date-fns/locale";
+import { type Product } from "~/schemas/products.schema";
 import { LazyModalConfirm } from "#components";
 import type { SelfProduced } from "~/types/self_produced";
-import type { Item } from "~/types/items";
 import { z } from "zod";
-import type { ItemOption } from "../types";
+import type { FullSelfProduced, ItemInfo } from "../types";
+const props = defineProps<{
+  update?: { id: string; title: string };
+}>();
 
 const emits = defineEmits(["close"]);
 const modal = useModal();
 const toast = useToast();
 
-const { data: itemOptions } = await useFetch<ItemOption[]>(
-  "/api/production/item_options"
+const { data: itemOptions } = await useFetch<ItemInfo[]>(
+  "/api/production/item_info"
 );
 const { selfProduced } = storeToRefs(useSelfProducedStore());
 
@@ -27,6 +27,28 @@ const state = reactive<SelfProduced>({
   description: undefined,
 });
 
+/**
+ * if update
+ */
+const sp = ref<FullSelfProduced>();
+if (props.update) {
+  await useFetch<FullSelfProduced>(
+    "/api/production/self_produced/" + props.update.id,
+    {
+      onResponse: ({ response }) => {
+        sp.value = response._data;
+      },
+    }
+  );
+  state.item = sp.value.item;
+  state.description = sp.value.description;
+}
+const diabledSumbit = computed<boolean>(() => {
+  if (!props.update) return false;
+  if (state.description !== sp.value.description) return false;
+  return true;
+});
+
 const onSubmit = async () => {
   modal.open(LazyModalConfirm, {
     label: {
@@ -38,29 +60,57 @@ const onSubmit = async () => {
       modal.close();
     },
     onContinue: async () => {
-      await $fetch<Product>("/api/production/self_produced", {
-        method: "POST",
-        body: state,
-        onResponse: ({ response }) => {
-          // addNewProduct(response._data);
-          selfProduced.value.push(response._data);
-          toast.add({
-            description: "Pesanan berhasil dibuat",
-          });
-          modal.close();
-          emits("close");
-        },
-        onResponseError: ({ error }) => {
-          toast.add({
-            color: "red",
-            title: error.name,
-            description: error.message,
-          });
-        },
-      });
+      if (!props.update) {
+        await $fetch<Product>("/api/production/self_produced/", {
+          method: "POST",
+          body: state,
+          onResponse: ({ response }) => {
+            // addNewProduct(response._data);
+            selfProduced.value.push(response._data);
+            toast.add({
+              description: "Pesanan berhasil dibuat",
+            });
+            modal.close();
+            emits("close");
+          },
+          onResponseError: ({ error }) => {
+            toast.add({
+              color: "red",
+              title: error.name,
+              description: error.message,
+            });
+          },
+        });
+      } else {
+        await $fetch<Product>(
+          "/api/production/self_produced/" + props.update.id,
+          {
+            method: "PATCH",
+            body: { description: state.description },
+            onResponse: ({ response }) => {
+              // addNewProduct(response._data);
+              selfProduced.value = selfProduced.value.map((sp) => {
+                if (sp.id !== props.update.id) return sp;
+                return response._data;
+              });
+              toast.add({
+                description: "Data berhasil diperbarui",
+              });
+              modal.close();
+              emits("close");
+            },
+            onResponseError: ({ error }) => {
+              toast.add({
+                color: "red",
+                title: error.name,
+                description: error.message,
+              });
+            },
+          }
+        );
+      }
     },
   });
-  // console.log("onsubmit");
 };
 </script>
 <template>
@@ -72,7 +122,7 @@ const onSubmit = async () => {
       <h3
         class="text-base font-semibold leading-6 text-gray-900 dark:text-white col-span-11"
       >
-        Tambah Product
+        {{ !update ? "Tambah Product" : "Edit " + update.title }}
       </h3>
       <div class="">
         <UButton
@@ -91,7 +141,7 @@ const onSubmit = async () => {
       :schema="SelfProducedSchema"
       @submit="onSubmit"
     >
-      <UFormGroup label="Item" name="item">
+      <UFormGroup label="Item" name="item" v-if="!update">
         <USelectMenu
           v-model="state.item"
           :options="itemOptions"
@@ -152,7 +202,7 @@ const onSubmit = async () => {
         </UFormGroup>
       </div> -->
       <div class="grid grid-cols-2 gap-1">
-        <UButton label="Simpan" type="submit" />
+        <UButton label="Simpan" type="submit" :disabled="diabledSumbit" />
         <UButton label="Batal" color="red" @click="emits('close')" />
       </div>
     </UForm>

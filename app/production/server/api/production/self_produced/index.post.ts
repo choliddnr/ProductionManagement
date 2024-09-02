@@ -1,5 +1,5 @@
 import type { FullSelfProduced, ItemOption } from "~/production/types";
-import { setToExpired } from "../../utils/storage";
+import { setToExpired } from "../../../utils/storage";
 import type { SelfProduced } from "~/types/self_produced";
 
 export default defineEventHandler(async (event): Promise<FullSelfProduced> => {

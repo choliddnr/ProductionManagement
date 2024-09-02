@@ -15,7 +15,7 @@ export const IngredientsSchema = z.object({
   self_produced_item: z.string(),
   ingredient: z.string(),
   quantity: z.number(),
-  substitutes: z.array(z.string()),
+  substitutes: z.array(z.string()).optional(),
 });
 
 export type Ingredients = z.output<typeof IngredientsSchema>;
